@@ -1,25 +1,59 @@
 import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import { getPosts, addPost } from './PostManager';
 
+const sessionUserId = localStorage.getItem("rare_userid")
+const userid =  parseInt(sessionUserId)
+//datetext=d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()
 const d = new Date(); 
 const initialState = {
-  user_id: '',
-  category_id: '',
-  title: '',
+  user_id: userid ,
+  category_id: "",
+  title: "",
   publication_date: d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate(),
-  image_url: '',
-  content: '',
-  approved: ''
+  image_url: "",
+  content: "",
+  approved: ""
 };
 
 
-export  function PostForm() {
+export  function PostForm( setPosts ) {
   const [formPost, setFormPost] = useState(initialState);
+  const history = useHistory();
+  useEffect( () => {
+    getPosts()
+  }, [])
 
+  // useEffect(() => {
+  //   if (obj) {
+  //     setFormPost({
+  //       user_id: obj.user_id,
+  //       category_id: obj.category_id,
+  //       title: obj.title,
+  //       image_url: obj.image_url,
+  //       content: obj.content,
+  //       approved: obj.approved,
+  //     });
+  //   }
+  // }, [obj]);
+
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+
+  //   setFormPost((prevState) => ({
+  //     ...prevState,
+  //     [name]: value,
+  //   }));
+  // };
   const handleChange = (e) => {
-    setFormPost((prevState) => ({
-      ...prevState,
-      [e.target.name]: e.target.value,
-    }));
+    const newPost = Object.assign({}, formPost,) 
+    let selectedVal = e.target.value
+    newPost[e.target.id] = selectedVal
+    setFormPost(newPost);
+  }
+
+  const resetForm = () => {
+    setFormPost(initialState);
   };
 
   const handleToggle = (e) => {
@@ -30,16 +64,12 @@ export  function PostForm() {
     }));
   };
 
-  const resetForm = () => {
-    setFormPost(initialState);
-  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     resetForm();
-    // createNote({ ...formNote, appId: firebaseKey }).then((notes) => {
-    //   setNoteCards(notes);
-    //   resetForm();
-    // });
+    addPost(formPost)
+    .then(history.push("/"))
     }
 
 //   const handleChange = (e) => {
@@ -57,25 +87,25 @@ export  function PostForm() {
     <fieldset>
         <div className="form-group">
             <label htmlFor="title">Title:</label>
-            <input type="text" id="title" required autoFocus className="form-control" placeholder="Title" onChange={handleChange} value={formPost.title} />
+            <input type="text" id="title" name="title" required autoFocus className="form-control" placeholder="Title" onChange={handleChange} value={formPost.title} />
         </div>
     </fieldset>
     <fieldset>
         <div className="form-group">
             <label htmlFor="image_url">image_url:</label>
-            <input type="url" id="image_url" required autoFocus className="form-control" onChange={handleChange} placeholder="image_url" value={formPost.image_url} />
+            <input type="url" id="image_url" name="image_url" required autoFocus className="form-control" onChange={handleChange} placeholder="image_url" value={formPost.image_url} />
         </div>
     </fieldset>
     <fieldset>
         <div className="form-group">
             <label htmlFor="content">Content:</label>
-            <input type="textarea" rows="6" id="content" required autoFocus className="form-control" onChange={handleChange} placeholder="contents" value={formPost.content} />
+            <input type="textarea" rows="6" id="content" name="content" required autoFocus className="form-control" onChange={handleChange} placeholder="contents" value={formPost.content} />
         </div>
     </fieldset>
     <fieldset>
         <div className="form-group">
             <label htmlFor="content">Approved:</label>
-            <input type="checkbox" id="approved" required autoFocus className="form-control"  onChange={handleToggle} value={formPost.approved} />
+            <input type="checkbox" id="approved" name="approved"  required autoFocus className="form-control"  onChange={handleToggle} value={formPost.approved} />
         </div>
     </fieldset>     
     <fieldset>
