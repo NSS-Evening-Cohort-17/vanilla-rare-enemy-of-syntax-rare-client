@@ -1,16 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { PostCard } from './PostCard';
 import { getPosts } from './PostManager';
-import { Home } from './Home'
+import { useHistory } from 'react-router-dom';
+// import { Home } from './Home'
 
 export const PostCardList = () => {
     const [ posts, setPosts ] = useState([])
+    const history = useHistory();
     useEffect(()=> {
         getPosts().then((postsData) => setPosts(postsData))
     }, [])
     return (
         <>
-            <div ><Home setPosts= {setPosts}/></div>
+            {/* <div ><Home/></div> */}
+            <button
+                className="app-btn"
+                type="submit"
+                onClick={() => history.push('/postform')}
+             >
+          Add a post
+        </button>
            
             <div className="posts">
                 {
@@ -22,3 +31,4 @@ export const PostCardList = () => {
 }
 
 // getPosts
+

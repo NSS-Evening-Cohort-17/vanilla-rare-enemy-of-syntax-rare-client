@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
-import { getPosts, addPost } from './PostManager';
+import { useHistory, useParams } from 'react-router-dom';
+import { getPosts, addPost, updatePost, getPostById } from './PostManager';
 
 const sessionUserId = localStorage.getItem("rare_userid")
 const userid =  parseInt(sessionUserId)
@@ -17,9 +17,11 @@ const initialState = {
 };
 
 
-export  function PostForm( setPosts ) {
+export  function PostForm() {
   const [formPost, setFormPost] = useState(initialState);
   const history = useHistory();
+  const { id } = useParams()
+  const editMode = id ? true : false  // true or false
   useEffect( () => {
     getPosts()
   }, [])
@@ -37,14 +39,15 @@ export  function PostForm( setPosts ) {
   //   }
   // }, [obj]);
 
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-
-  //   setFormPost((prevState) => ({
-  //     ...prevState,
-  //     [name]: value,
-  //   }));
-  // };
+  useEffect(() => {
+    if (editMode) {
+      let isMounted = true;
+        getPostById(id).then((res) => {
+          if (isMounted)  setFormPost(res)
+        })
+    }
+    // getLocations().then(locationsData => setLocations(locationsData))
+}, [])
   const handleChange = (e) => {
     const newPost = Object.assign({}, formPost,) 
     let selectedVal = e.target.value
@@ -64,13 +67,29 @@ export  function PostForm( setPosts ) {
     }));
   };
 
-
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();    
+  //   resetForm();
+  //   addPost(formPost)
+  //   .then(history.push("/"))
+  // }
   const handleSubmit = (e) => {
     e.preventDefault();
-    resetForm();
-    addPost(formPost)
-    .then(history.push("/"))
+    if (editMode) {
+      // update the item
+      updatePost(formPost).then(() => {
+        history.push('/');
+        resetForm();
+      });
+    } else {
+      addPost(formPost).then(() => {
+        history.push('/');
+        resetForm();
+      });
     }
+    
+    
+  }
 
 //   const handleChange = (e) => {
 //     const { name, value } = e.target;
@@ -136,7 +155,7 @@ export  function PostForm( setPosts ) {
     </fieldset> */}
     <button className="btn btn-primary"
         onClick={handleSubmit}>
-        Save
+        {editMode ? "Save Updates" : "Add a new post"}
   </button>
 </form>
 )
