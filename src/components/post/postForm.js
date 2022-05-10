@@ -78,15 +78,17 @@ export  function PostForm() {
     if (editMode) {
       // update the item
       updatePost(formPost).then(() => {
+        history.push('/');
         resetForm();
       });
     } else {
       addPost(formPost).then(() => {
+        history.push('/');
         resetForm();
       });
     }
     
-    history.push('/');
+    
   }
 
 //   const handleChange = (e) => {
