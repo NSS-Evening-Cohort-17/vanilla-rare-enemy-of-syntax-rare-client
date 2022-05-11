@@ -9,7 +9,7 @@ export const PostDetailCard = () => {
         getPostById(id).then((res) => {
             setCard(res)
         })
-    })
+    }, [])
 
 return ( 
 
