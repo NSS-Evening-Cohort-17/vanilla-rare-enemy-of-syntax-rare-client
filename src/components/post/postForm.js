@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import { getPosts, addPost, updatePost, getPostById } from './PostManager';
+import { addPost, updatePost, getPostById, getCategories } from './PostManager';
 
 const sessionUserId = localStorage.getItem("rare_userid")
 const userid =  parseInt(sessionUserId)
@@ -19,25 +19,16 @@ const initialState = {
 
 export  function PostForm() {
   const [formPost, setFormPost] = useState(initialState);
+  const [categories, setCategories ] = useState([]);
+
   const history = useHistory();
   const { id } = useParams()
-  const editMode = id ? true : false  // true or false
-  useEffect( () => {
-    getPosts()
-  }, [])
 
-  // useEffect(() => {
-  //   if (obj) {
-  //     setFormPost({
-  //       user_id: obj.user_id,
-  //       category_id: obj.category_id,
-  //       title: obj.title,
-  //       image_url: obj.image_url,
-  //       content: obj.content,
-  //       approved: obj.approved,
-  //     });
-  //   }
-  // }, [obj]);
+  //https://stackoverflow.com/questions/31413053/how-to-use-an-array-as-option-for-react-select-component
+
+  const editMode = id ? true : false  // true or false
+
+
 
   useEffect(() => {
     if (editMode) {
@@ -46,8 +37,15 @@ export  function PostForm() {
           if (isMounted)  setFormPost(res)
         })
     }
-    // getLocations().then(locationsData => setLocations(locationsData))
+    getCategories().then((categoryData) => setCategories(categoryData));
+    // getCategories().then(setCategories)  
+    // console.log(categories)
 }, [])
+
+// useEffect(() => {
+//   getCategories().then((categoryData) => setCategories(categoryData));
+// }, [])
+
   const handleChange = (e) => {
     const newPost = Object.assign({}, formPost,) 
     let selectedVal = e.target.value
@@ -67,38 +65,25 @@ export  function PostForm() {
     }));
   };
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();    
-  //   resetForm();
-  //   addPost(formPost)
-  //   .then(history.push("/"))
-  // }
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    resetForm();
     if (editMode) {
       // update the item
       updatePost(formPost).then(() => {
         history.push('/');
-        resetForm();
+
       });
     } else {
       addPost(formPost).then(() => {
         history.push('/');
-        resetForm();
+
       });
-    }
-    
+    }   
     
   }
 
-//   const handleChange = (e) => {
-//     const { name, value } = e.target;
-
-//     setFormNote((prevState) => ({
-//       ...prevState,
-//       [name]: value,
-//     }));
-//   };
 
   return (
     <form className="postForm">
@@ -124,35 +109,37 @@ export  function PostForm() {
     <fieldset>
         <div className="form-group">
             <label htmlFor="content">Approved:</label>
-            <input type="checkbox" id="approved" name="approved"  required autoFocus className="form-control"  onChange={handleToggle} value={formPost.approved} />
+            <input type="checkbox" id="approved" name="approved"  required autoFocus className="form-control"   checked={formPost.approved ? 'checked' : ''} onChange={handleToggle} />
         </div>
-    </fieldset>     
+    </fieldset> 
     <fieldset>
         <div className="form-group">
-            <label htmlFor="category_id">Category: </label>
+        <label htmlFor="category_id">Assign to location: </label>
+					<select value={formPost.category_id} name="category_id" id="category_id" onChange={handleChange} className="form-control" >
+						<option value="0">Select a category</option>
+						{categories.map(l => (
+							<option key={l.id} value={l.id}>
+								{l.label}
+							</option>
+						))}
+					</select>
+        </div>
+    </fieldset> 
+
+    {/* <fieldset>
+        <div className="form-group">
+            <label htmlFor="id">Category: </label>
             <select value={formPost.category_id} name="category_id" id="category_id"  className="form-control" onChange={handleChange} >
                 <option value="">Select a category</option>
                 <option value="1">News</option>
                 <option value="2">Entertainment</option>
                 <option value="3">World</option>
-                <option value="4">Local</option>
+                <option value="6">Local</option>
 
             </select>
         </div>
-    </fieldset> 
-    {/* <fieldset>
-        <div className="form-group">
-            <label htmlFor="customerId">Customer: </label>
-            <select value={animal.customerId} name="customer" id="customerId" onChange={handleControlledInputChange} className="form-control" >
-                <option value="0">Select a customer</option>
-                {customers.map(c => (
-                    <option key={c.id} value={c.id}>
-                        {c.name}
-                    </option>
-                ))}
-            </select>
-        </div>
-    </fieldset> */}
+    </fieldset>  */}
+
     <button className="btn btn-primary"
         onClick={handleSubmit}>
         {editMode ? "Save Updates" : "Add a new post"}

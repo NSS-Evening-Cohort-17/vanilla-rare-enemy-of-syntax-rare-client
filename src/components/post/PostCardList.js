@@ -8,7 +8,10 @@ export const PostCardList = () => {
     const [ posts, setPosts ] = useState([])
     const history = useHistory();
     useEffect(()=> {
-        getPosts().then((postsData) => setPosts(postsData))
+        let isMounted = true;
+        getPosts().then((postsData) => {
+          if (isMounted) setPosts(postsData)
+        })
     }, [])
     return (
         <>

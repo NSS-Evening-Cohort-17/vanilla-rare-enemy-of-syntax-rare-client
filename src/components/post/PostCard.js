@@ -41,8 +41,7 @@ import { deletePost, getPosts } from './PostManager';
             <h5 className="card-title">{renderCategory(post.category_id)}</h5> 
             <Link to={`/detail/${id}`} >Detail</Link>   
             {/* <button type="button"  onClick={() => handleMethod('detail',post.id)}> Detail </button>     */}
-            { userid === post.user_id ?  (
-                // <button type="button"  onClick={() => handleMethod('edit',post.id)} > Edit </button>
+            { userid === post.user_id ?  (                
                 <Link to={`/edit/${id}`} >
                 Edit
               </Link>
